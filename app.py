@@ -1,23 +1,31 @@
-from flask import Flask
-from os import environ
-from configuracion import conexion
-from dotenv import load_dotenv
-from models.categorias_model import Categoria
-
-load_dotenv()
+from flask import Flask, request
+from controllers.poductos_controller import ProductosController
+from db import db
+from flask_migrate import Migrate
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI']= environ.get('DATABASE_URL')
 
-## inicializa la aplicacion de SQLAlchemy con nuestra app de flask
-conexion.init_app(app)
 
-@app.before_first_request
-def inicializadora():
-    conexion.create_all()
+
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///project.db"
+db.init_app(app)
+
+migrate = Migrate(app, db)
+
+@app.route("/")
+def index():
+    return " Mi aplicaion con Flask"
+
+
+@app.route("/productos/lista", methods=['GET'])
+def productosListar():
+    controller = ProductosController()
+    return controller.ListarProductos()
+
+@app.route("/productos/crear", methods=['POST'])
+def productosCrear():
+    controller = ProductosController()
+    return controller.create(request.get_json())
 
 if __name__ == '__main__':
     app.run(debug=True)
-
-
-

@@ -1,2 +1,2 @@
-entorno_prueba
-.env
+venv/
+__pycache__/
