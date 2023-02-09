@@ -127,3 +127,23 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+## modificar la tabla auth_user
+
+AUTH_USER_MODEL ='gestion.UsuarioModel'
+
+## agregar esto
+## primero instalas -> pip install djangorestframework-simplejwt
+## luego lo importamos desde url de gestion
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+from datetime import timedelta
+
+ ## PARA MODIFICA LA CONFIGURACION DE LA LIBRERIA DE LA JWT
+SIMPLE_JWT={
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1, minutes=10, seconds=5)
+}

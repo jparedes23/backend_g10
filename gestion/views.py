@@ -1,8 +1,8 @@
-from rest_framework.generics import ListCreateAPIView, DestroyAPIView, ListAPIView
-from .models import CategoriasModel, PlatosModel
+from rest_framework.generics import ListCreateAPIView, DestroyAPIView, ListAPIView, CreateAPIView
+from .models import CategoriasModel, PlatosModel, UsuarioModel
 from rest_framework.response import Response
 from rest_framework.request import Request
-from .serializers import CategoriasSerializers, PlatoSerializers
+from .serializers import CategoriasSerializers, MostrarPlatoSerializers, CreacionPlatoSerializers, CategoriaConPlatosSerializer, RegistroUsuarioSerializers
 # List > Listar (get)
 # Create > Crear (post)
 
@@ -24,7 +24,7 @@ class CategoriasApiView(ListCreateAPIView):
 class PlatosApiView(ListCreateAPIView):
     
     queryset= PlatosModel.objects.all()
-    serializer_class= PlatoSerializers
+    #serializer_class= CreacionPlatoSerializers
 
     def get(self, request: Request):
         # al colocar (:) indicamos que el tipo de datos que sera esa variable en el caso que no le hemos seteado correctamente
@@ -33,7 +33,7 @@ class PlatosApiView(ListCreateAPIView):
         print(resultado)
         ## aca llamamos al serializer y ble pasamos la informacion proviniente de la bd y con el parametro many=True indicamos que estamos pasando un arreglo de instancias
         ## no devuelve un diciionario arreglado
-        serializador = PlatoSerializers(instance=resultado, many=True)
+        serializador = MostrarPlatoSerializers(instance=resultado, many=True)
         print (serializador.data)
         return Response(data={
             'content': serializador.data
@@ -41,7 +41,7 @@ class PlatosApiView(ListCreateAPIView):
     def post(self, request:Request):
         body = request.data
     # cuando queremos verificar si la informacion es validad entonces utilizamos el paremetro data
-        serializador = PlatoSerializers(data=body)
+        serializador = CreacionPlatoSerializers(data=body)
         valida = serializador.is_valid()
 
             # si la data pasada al serializador es una data validad se guardara en el atributo valide_data que es un diccionario
@@ -59,7 +59,7 @@ class PlatosApiView(ListCreateAPIView):
 
         nuevoPlato=serializador.save()
         print(nuevoPlato)
-        serializar = PlatoSerializers(instance=nuevoPlato)
+        serializar = MostrarPlatoSerializers(instance=nuevoPlato)
 
         return Response(data={
             'message': 'Plato creado exitosamente',
@@ -68,7 +68,7 @@ class PlatosApiView(ListCreateAPIView):
 
 class PlatoDestroyApiView(DestroyAPIView):
     queryset = PlatosModel.objects.all()
-    serializer_class = PlatoSerializers
+    serializer_class = MostrarPlatoSerializers
 
     def delete(self, request: Request, pk: int):
         print(pk)
@@ -92,8 +92,35 @@ class ListarCategoriaApiView(ListAPIView):
             return Response(data={
                 'message':'Categoria no Existe'
             })
-        serializador = CategoriasSerializers(instance=categoriaEncotrada)
+        
+        #print (dir(categoriaEncotrada))
+        print(categoriaEncotrada.platos.all())
+
+        serializador = CategoriaConPlatosSerializer(instance=categoriaEncotrada)
 
         return Response(data={
             'content': serializador.data
         })
+
+
+class RegistroApiView(CreateAPIView):
+    def post(self, request):
+        serializador = RegistroUsuarioSerializers(data = request.data)
+        validacion = serializador.is_valid()
+        if validacion is False:
+            return Response(data={
+                'message': 'error al crear el usuario',
+                'content': serializador.errors
+            })
+        ## inicializo el nuevo usuario con la informacion validada
+        nuevoUsuario = UsuarioModel(**serializador.validated_data)
+        ## ahora genero el has de la contraseña
+        nuevoUsuario.set_password(serializador.validated_data.get('password'))
+        ## guardo el usuario en la base de datos
+        nuevoUsuario.save()
+
+        return Response (data={
+            'message': 'Usuario creado exitosamente'
+        }, status=201)
+
+
