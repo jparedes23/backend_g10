@@ -3,10 +3,13 @@ from .models import CategoriasModel, PlatosModel, UsuarioModel
 from rest_framework.response import Response
 from rest_framework.request import Request
 from .serializers import CategoriasSerializers, MostrarPlatoSerializers, CreacionPlatoSerializers, CategoriaConPlatosSerializer, RegistroUsuarioSerializers
+from rest_framework.permissions import IsAuthenticated
+
 # List > Listar (get)
 # Create > Crear (post)
 
 class CategoriasApiView(ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     # al utilizar una vista generica que ya no es necesario definir el comportamiento para cuando sea get o post
     # queryset > el comando que utilizara para llamar a la informacion de nuestra base de datos
     # SELECT * FROM categoria;
@@ -104,7 +107,7 @@ class ListarCategoriaApiView(ListAPIView):
 
 
 class RegistroApiView(CreateAPIView):
-    def post(self, request):
+    def post(self, request: Request):
         serializador = RegistroUsuarioSerializers(data = request.data)
         validacion = serializador.is_valid()
         if validacion is False:

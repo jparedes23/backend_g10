@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'gestion'
+   #new line
 ]
 
 MIDDLEWARE = [
@@ -142,8 +143,8 @@ REST_FRAMEWORK = {
 }
 
 from datetime import timedelta
-
- ## PARA MODIFICA LA CONFIGURACION DE LA LIBRERIA DE LA JWT
-SIMPLE_JWT={
+# modificar la configuracion de la libreria de las JWT
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=1, minutes=10, seconds=5)
 }

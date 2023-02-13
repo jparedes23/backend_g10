@@ -26,7 +26,6 @@ class PlatosModel(models.Model):
 
     class Meta:
         db_table ='platos'
-
 #como vamos amodificar el comportamiento de la tabla auth_user de Django entonmces tenemos que modificar su herencia
 class UsuarioModel(AbstractBaseUser , PermissionsMixin):
 ## AbstractBaseUser -> me permite modificar todo del modelo auth_user mientras
@@ -36,7 +35,7 @@ class UsuarioModel(AbstractBaseUser , PermissionsMixin):
     apellido = models.CharField(max_length=50, null=False)
     correo = models.EmailField(max_length=100, unique=True, null=False)
     password =models.TextField(null=False)# -> tiene que ser password
-    tipoUsusrio= models.CharField(max_length=40, choices=[
+    tipoUsuario= models.CharField(max_length=40, choices=[
         ('ADMIN', 'ADMINISTRADOR'),
         ('MOZO','MOZO'),
         ('CLIENTE','CLIENTE')
@@ -55,8 +54,7 @@ class UsuarioModel(AbstractBaseUser , PermissionsMixin):
     REQUIRED_FIELDS =['nombre', 'apellido','tipoUsuario']
 
     # hacemos uso de UsuarioManager que viene de auth_manager.py
-    object = UsuarioManager()
-
+    objects = UsuarioManager()
     class Meta:
         db_table = 'usuarios'
 
